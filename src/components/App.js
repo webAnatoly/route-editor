@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map, Marker, MarkerLayout } from 'yandex-map-react';
+import YandexMap from './YandexMap';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -8,9 +8,7 @@ export default class App extends React.Component {
   render() {
     return(
       <div>
-        <Map onAPIAvailable={() => console.log('API loaded')} center={[55.754734, 37.583314]} zoom={5}>
-          <Marker lat={55.75} lon={37.9} />
-        </Map>
+        <YandexMap ymaps={this.props.ymaps}/>
       </div>
     )
   }

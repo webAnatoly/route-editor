@@ -26,7 +26,6 @@
     "webpack-dev-server": "^3.1.1"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "yandex-map-react": "^1.1.1"
+    "babel-polyfill": "^6.26.0"
   }
 }
