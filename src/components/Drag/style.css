@@ -1,0 +1,17 @@
+.hover:hover {
+  cursor: grab;
+  cursor: -webkit-grab;
+}
+
+
+.main {
+  width: 280px; 
+  height: 35px; 
+  color: rgba(134, 134, 134, 0.9);
+  background-color: lightgrey;
+  z-index: -1;
+  opacity: 0.5; 
+  padding-top: 5px;
+  padding-right: 25px;
+  padding-left: 10px;
+}

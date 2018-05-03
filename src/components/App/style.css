@@ -1,0 +1,8 @@
+.app {
+  position: relative;
+  width: 900px;
+  margin: auto;
+  margin-top: 40px;
+  padding: 5px;
+  min-height: 700px;
+}
