@@ -19,8 +19,8 @@ export default class OnePointRow extends React.Component {
   render() {
     let hover = this.props.hoverON ? s.hover : '';
     return (
-      <div ref={this.myRef} className={`${s.rowContainer} ${hover}`}>
-          <span className={`${s.noSelect}`}>Точка маршрута {this.props.id + 1} {this.props.value}</span>
+      <div ref={this.myRef} className={`${s.rowContainer} ${hover}`} id={this.props.id}>
+        <span className={`${s.noSelect}`}>{this.props.value} {this.props.id + 1}</span>
           <button className={s.button} onClick={this.handleClick}><span className={s.noSelect}>&#10005;</span></button>
       </div>
     )

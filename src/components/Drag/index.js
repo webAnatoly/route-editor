@@ -7,11 +7,10 @@ export default class Drag extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     const stylesDrag = { // высота будет менятся, поэтому тут оставил. Остальное в style.css
       height: '35px'
     }
-    // добавляем в базовые стили, стили пришедшие из пропсов
+    // добавляем в stylesDrag, стили пришедшие из пропсов
     for (let key in this.props.styles) {
       stylesDrag[key] = this.props.styles[key]; 
     }

@@ -51,7 +51,6 @@ export default class Container extends React.Component {
       target = target.parentElement;
     }
     const currentOnePointRow = target;
-    console.log(currentOnePointRow.innerHTML);
 
     const containerPositionY = this.myRef.current.getBoundingClientRect().top + pageYOffset;
     const cursorDifference = event.pageY - (currentOnePointRow.getBoundingClientRect().top + pageYOffset);
@@ -77,20 +76,48 @@ export default class Container extends React.Component {
     }
     // еще надо реализовать обработку быстрого ухода мыши с элемента
     // и автопрокрутку страницы если колво рядов уходит за пределы экрана
+    // чтобы не выходил за пределы inputa при перетаскивании
     this.myRef.current.addEventListener('mousemove', handleMouseMove);
 
     const handleMouseUp = (event) => {
+      
+      // находим компонент OnePointRow
+      let target = event.target;
+      while (target.tagName !== 'DIV') {
+        target = target.parentElement;
+      }
+      let onePointRow = target;
+
+      // удаляем обработчики
       this.myRef.current.removeEventListener('mousemove', handleMouseMove);
-      this.setState({
-        drag: { on: false, styles: {}, hoverON: false },
-        html: ''
-      })
+      this.myRef.current.parentElement.removeEventListener('mouseup', handleMouseUp);
+
+      // меняем положение рядов 
+      if (currentOnePointRow.id !== onePointRow.id) {
+        const idDelete = currentOnePointRow.id;
+        const idInsert = onePointRow.id;
+        this.setState((prevState)=>{
+          const arr = prevState.points;
+          const value = arr.splice(idDelete, 1);
+          arr.splice(idInsert, 0, value[0]);
+          return({
+            points: arr,
+            drag: { on: false, styles: {}, hoverON: false },
+            html: ''
+          })
+        });
+      } else {
+        this.setState({
+          drag: { on: false, styles: {}, hoverON: false },
+          html: ''
+        })
+      }
     }
-    this.myRef.current.addEventListener('mouseup', handleMouseUp);
+    this.myRef.current.parentElement.addEventListener('mouseup', handleMouseUp);
   }
 
   render() {
-    let drag = false;
+    let drag;
     if (this.state.drag.on) {
       drag = <Drag styles={this.state.drag.styles} html={this.state.html}/>;
     }
