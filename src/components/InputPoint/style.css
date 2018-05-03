@@ -1,7 +1,26 @@
 .main {
-  position: inherit;
+  position: relative;
   display: block;
   width: 100%;
   border: 2px solid black;
   padding: 5px;
+  padding-right: 42px;
+  padding-left: 10px;
+}
+
+.search {
+  position: absolute;
+  display: block;
+  top: 5px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  background-color: lightblue;
+  text-align: center;
+}
+
+.search:hover {
+  cursor: pointer;
+  font-size: 1.4rem;
 }

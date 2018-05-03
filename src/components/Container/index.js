@@ -1,8 +1,10 @@
 import React from 'react';
-import s from './style.css';
 import OnePointRow from '../OnePointRow';
 import InputPoint from '../InputPoint';
 import Drag from '../Drag';
+
+import s from './style.css';
+import checkClass from '../OnePointRow/style.css'
 
 export default class Container extends React.Component {
   constructor(props) {
@@ -15,7 +17,6 @@ export default class Container extends React.Component {
     }
     this.handleDragStart = this.handleDragStart.bind(this);
     this.removeEntryPoint = this.removeEntryPoint.bind(this);
-    this.handleKeyUP = this.handleKeyUP.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
   }
 
@@ -33,8 +34,7 @@ export default class Container extends React.Component {
     })
   }
 
-  handleKeyUP(event) {
-    let value = event.target.value;
+  handleKeyPress(value) {
     this.setState((prevState) => {
       prevState.points.push(value);
       return {points: prevState.points}
@@ -46,11 +46,11 @@ export default class Container extends React.Component {
     let target = event.target;
     if (target.classList.contains(s.container)) return; // если кликнули непосредственно на самом контейнере, то выходим тоже
     while (target.tagName !== 'DIV') {
-      if (target.tagName === 'BUTTON') return;
-      if (target.tagName === 'INPUT') return;
+      if (target.tagName === 'BUTTON' || target.tagName === 'INPUT') return;
       target = target.parentElement;
     }
     const currentOnePointRow = target;
+    if(currentOnePointRow.classList[0] !== checkClass.rowContainer) return; 
 
     const containerPositionY = this.myRef.current.getBoundingClientRect().top + pageYOffset;
     const cursorDifference = event.pageY - (currentOnePointRow.getBoundingClientRect().top + pageYOffset);
@@ -80,7 +80,7 @@ export default class Container extends React.Component {
     this.myRef.current.addEventListener('mousemove', handleMouseMove);
 
     const handleMouseUp = (event) => {
-      
+
       // находим компонент OnePointRow
       let target = event.target;
       while (target.tagName !== 'DIV') {
@@ -92,7 +92,7 @@ export default class Container extends React.Component {
       this.myRef.current.removeEventListener('mousemove', handleMouseMove);
       this.myRef.current.parentElement.removeEventListener('mouseup', handleMouseUp);
 
-      // меняем положение рядов 
+      // меняем положение рядов
       if (currentOnePointRow.id !== onePointRow.id) {
         const idDelete = currentOnePointRow.id;
         const idInsert = onePointRow.id;
@@ -126,9 +126,9 @@ export default class Container extends React.Component {
     });
     return (
       <div className={`${s.container}`} onDragStart={this.handleDragStart} onMouseDown={this.handleMouseDown} ref={this.myRef}>
-        <InputPoint onHandleKeyUP={this.handleKeyUP}/>
-        {drag}
-        {points}
+        <InputPoint onHandleKeyPress={this.handleKeyPress.bind(this)} />
+          {drag}
+          {points}
       </div>
     )
   }

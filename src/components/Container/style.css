@@ -1,12 +1,6 @@
 .container {
-  position: relative;
-  width: 280px;
-  min-height: 600px;
+  position: inherit;
+  width: 380px;
   border: none;
   font-size: 1.3rem;
-}
-
-.hover:hover {
-  color: red;
-  border: 2px dashed red;
 }

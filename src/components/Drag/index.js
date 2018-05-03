@@ -1,5 +1,6 @@
 import React from 'react';
 import s from './style.css';
+import stylesOnePointRow from '../OnePointRow/style.css'
 
 export default class Drag extends React.Component {
   constructor(props) {
@@ -15,7 +16,7 @@ export default class Drag extends React.Component {
       stylesDrag[key] = this.props.styles[key]; 
     }
     return(
-      <div style={stylesDrag} className={`${s.hover} ${s.main}`} dangerouslySetInnerHTML={{__html: this.props.html}}></div>
+      <div style={stylesDrag} className={`${s.hover} ${s.base} ${stylesOnePointRow.rowContainer}`} dangerouslySetInnerHTML={{__html: this.props.html}}></div>
     )
   }
 }
