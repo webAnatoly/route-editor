@@ -13,14 +13,8 @@ export default class YandexMap extends React.Component {
     )
   }
   componentDidMount(){
-    // const ymaps = this.props.ymaps;
+    // const ymaps = window.ymaps;
     let myMap;
-
-    /* 
-    Раскомментить когда дойдет дело до работы с картой.
-    Закомментил, чтобы каждый раз не ждать её загрузки. 
-    Так же не забыть расскомментить в index.html и потом через props'ы прокинуть объект ymaps сюда. 
-    */
     
     // ymaps.ready(function () {
     //   myMap = new ymaps.Map("first_map", {

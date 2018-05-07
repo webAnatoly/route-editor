@@ -2,43 +2,62 @@ import React from 'react';
 import OnePointRow from '../OnePointRow';
 import InputPoint from '../InputPoint';
 import Drag from '../Drag';
-
 import s from './style.css';
-import checkClass from '../OnePointRow/style.css'
+import checkClass from '../OnePointRow/style.css';
+
+import {mainStore} from '../../data/Stores';
+import Dispatcher from '../../data/appDispatcher';
+import keyMirror from 'fbjs/lib/keyMirror';
+
+const actions = keyMirror({
+  DRAG_START: null,
+  DRAG_MOUSE_MOVE: null,
+  MOUSE_UP_DROP: null
+})
+
+Dispatcher.register((action)=>{
+  switch(action.type){
+    case actions.DRAG_START:
+      mainStore.Container.drag = action.drag;
+      mainStore.Container.html = action.html;
+      mainStore.setState('Container', mainStore.Container);
+      break;
+    case actions.DRAG_MOUSE_MOVE:
+      mainStore.Container.drag = action.drag;
+      mainStore.setState('Container', mainStore.Container);
+      break;
+    case actions.MOUSE_UP_DROP:
+      if (action.sameRow) { // если отпустили мышку над тем же элементом
+        mainStore.Container.drag = action.drag;
+        mainStore.Container.html = action.html;
+        mainStore.setState('Container', mainStore.Container);
+        break;
+      }
+      const value = action.arrPoints.splice(action.idDelete, 1);
+      action.arrPoints.splice(action.idInsert, 0, value[0]);
+      mainStore.setState('Container', {
+        points: action.arrPoints,
+        drag: { on: false, styles: {}, hoverON: false },
+        html: ''
+      });
+      break;
+    default:
+      return null
+  }
+})
 
 export default class Container extends React.Component {
   constructor(props) {
     super(props);
     this.myRef = React.createRef();
-    this.state = {
-      points: [],
-      drag: {on: false, styles: {}, hoverON: false},
-      html: ''
-    }
+    this.state = mainStore.Container;
+
     this.handleDragStart = this.handleDragStart.bind(this);
-    this.removeEntryPoint = this.removeEntryPoint.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
   }
 
   handleDragStart(e) {
     e.preventDefault();
-  }
-
-  removeEntryPoint(id) {
-    this.setState((prevState)=>{
-      let arr = prevState.points;
-      let arrWithoutElement = arr.filter((item, index)=>{
-        return index != id;
-      });
-      return { points: arrWithoutElement}
-    })
-  }
-
-  handleKeyPress(value) {
-    this.setState((prevState) => {
-      prevState.points.push(value);
-      return {points: prevState.points}
-    });
   }
 
   handleMouseDown(event) {
@@ -59,25 +78,33 @@ export default class Container extends React.Component {
       return cursorPosition - containerPositionY - cursorDifference;
     }
 
+    const inputElementHeight = this.myRef.current.querySelector('input').getBoundingClientRect().height;
+    console.log('inputElementHeiht', inputElementHeight);
+
     const topForAbsolutePosition = getPosition(event.pageY);
-    this.setState({
-      drag: { 
-        on: true, 
-        styles: { position: 'absolute', top: topForAbsolutePosition, height: heightCurrentOnePointRow},
+
+    Dispatcher.dispatch({
+      type: 'DRAG_START',
+      drag: {
+        on: true,
+        styles: { position: 'absolute', top: topForAbsolutePosition, height: heightCurrentOnePointRow },
+        hoverON: false,
       },
       html: currentOnePointRow.innerHTML
     })
 
     const handleMouseMove = (event) => {
       const space = getPosition(event.pageY);
-      this.setState({
-        drag: { on: true, styles: { position: 'absolute', top: space, height: heightCurrentOnePointRow }, hoverON: true },
-      });
+      Dispatcher.dispatch({
+        type: 'DRAG_MOUSE_MOVE',
+        drag: { on: true, styles: { position: 'absolute', top: space, height: heightCurrentOnePointRow }, hoverON: true }
+      })
     }
     // еще надо реализовать обработку быстрого ухода мыши с элемента
     // и автопрокрутку страницы если колво рядов уходит за пределы экрана
     // чтобы не выходил за пределы inputa при перетаскивании
     this.myRef.current.addEventListener('mousemove', handleMouseMove);
+    console.log(this.myRef.current);
 
     const handleMouseUp = (event) => {
 
@@ -94,20 +121,17 @@ export default class Container extends React.Component {
 
       // меняем положение рядов
       if (currentOnePointRow.id !== onePointRow.id) {
-        const idDelete = currentOnePointRow.id;
-        const idInsert = onePointRow.id;
-        this.setState((prevState)=>{
-          const arr = prevState.points;
-          const value = arr.splice(idDelete, 1);
-          arr.splice(idInsert, 0, value[0]);
-          return({
-            points: arr,
-            drag: { on: false, styles: {}, hoverON: false },
-            html: ''
-          })
-        });
-      } else {
-        this.setState({
+        Dispatcher.dispatch({
+          type: 'MOUSE_UP_DROP',
+          sameRow: false, 
+          idDelete: currentOnePointRow.id,
+          idInsert: onePointRow.id,
+          arrPoints: this.state.points
+        })
+      } else { // если mouseup случилось на том же элементе, что и mousedown
+        Dispatcher.dispatch({
+          type: 'MOUSE_UP_DROP',
+          sameRow: true, 
           drag: { on: false, styles: {}, hoverON: false },
           html: ''
         })
@@ -122,14 +146,31 @@ export default class Container extends React.Component {
       drag = <Drag styles={this.state.drag.styles} html={this.state.html}/>;
     }
     const points = this.state.points.map((point, index)=>{
-      return <OnePointRow value={point} key={index} id={index} onRemove={this.removeEntryPoint} hoverON={this.state.drag.hoverON}/>
+      return <OnePointRow value={point} key={index} id={index} hoverON={this.state.drag.hoverON}/>
     });
     return (
       <div className={`${s.container}`} onDragStart={this.handleDragStart} onMouseDown={this.handleMouseDown} ref={this.myRef}>
-        <InputPoint onHandleKeyPress={this.handleKeyPress.bind(this)} />
+        <InputPoint/>
           {drag}
           {points}
       </div>
     )
   }
+
+  componentDidMount() {
+    mainStore.addChangeListener(this.handleUpdateEvent.bind(this));
+  }
+
+  componentWillUnmount() {
+    mainStore.removeChangeListener(this.handleUpdateEvent.bind(this));
+  }
+
+  handleUpdateEvent() {
+    this.setState(mainStore.getState('Container'));
+  }
+
+  componentDidUpdate(){
+    // console.log('mouse click', this.state.drag);
+  }
+
 }

@@ -1,12 +1,8 @@
 import React from 'react';
 import s from './style.css';
-import stylesOnePointRow from '../OnePointRow/style.css'
+import stylesOnePointRow from '../OnePointRow/style.css';
 
 export default class Drag extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
   render() {
     const stylesDrag = { // высота будет менятся, поэтому тут оставил. Остальное в style.css
       height: '35px'
@@ -18,5 +14,13 @@ export default class Drag extends React.Component {
     return(
       <div style={stylesDrag} className={`${s.hover} ${s.base} ${stylesOnePointRow.rowContainer}`} dangerouslySetInnerHTML={{__html: this.props.html}}></div>
     )
+  }
+
+  componentDidMount(){
+    // console.log('component Drag DidMount');
+  }
+
+  componentWillUnmount(){
+    // console.log('component Drag will Unmount');
   }
 }
