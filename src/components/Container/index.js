@@ -119,40 +119,34 @@ export default class Container extends React.Component {
       let target = event.target;
       while (target.tagName !== 'HTML') {
         if(target.dataset.about === 'OnePointRow') {
-          console.log('dataset', target.dataset.about);
           break;
         }
         target = target.parentElement;
       }
       let onePointRow = target;
-      let idInsert;
 
-      if (onePointRow.dataset.about === 'OnePointRow') { // mouseup над компонентом 'OnePointRow'
-        idInsert = onePointRow.id;
+      if (currentOnePointRow.id === onePointRow.id) { // если mouseup случилось на том же элементе, что и mousedown
+        Dispatcher.dispatch({
+          type: 'MOUSE_UP_DROP',
+          condition: 'sameRow',
+          drag: { on: false, styles: {} },
+          html: ''
+        })
       } else {
+        let idInsert;
         const [x, y] = [this.myRef.current.getBoundingClientRect().left + this.myRef.current.getBoundingClientRect().width / 2, event.pageY]
-        const elem = document.elementFromPoint(x, y);// получить элемент над которым был mouseup
-        if (elem.dataset.about === 'OnePointRow') {
+        const elem = document.elementFromPoint(x, y);
+        if (elem && elem.dataset.about === 'OnePointRow') {
           idInsert = elem.id;
         } else {
           idInsert = event.pageY < topBorder ? 0 : this.state.points.length - 1;
-        }
-      } 
-
-      if (currentOnePointRow.id !== onePointRow.id) {
+        } 
         Dispatcher.dispatch({
           type: 'MOUSE_UP_DROP',
           condition: 'anotherRow',
           idDelete: currentOnePointRow.id,
           idInsert: idInsert,
           arrPoints: this.state.points
-        })
-      } else { // если mouseup случилось на том же элементе, что и mousedown
-        Dispatcher.dispatch({
-          type: 'MOUSE_UP_DROP',
-          condition: 'sameRow',
-          drag: { on: false, styles: {} },
-          html: ''
         })
       }
     }
