@@ -1,9 +1,6 @@
 import React from 'react';
 import YandexMap from '../YandexMap';
 import Container from '../Container';
-import Button from '../Button';
-import MinusButton from '../MinusButton';
-import Message from '../Message';
 
 import Dispatcher from '../../data/appDispatcher';
 import { mainStore } from '../../data/Stores';
