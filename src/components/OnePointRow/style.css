@@ -43,10 +43,3 @@
   -moz-user-select: none;
   -ms-user-select: none;
 }
-
-.hover:hover {
-  opacity: 0;
-  /* ниже запасные свойства, если opacity не сработает */
-  color: transparent;
-  border: 4px dashed lightgrey;
-}

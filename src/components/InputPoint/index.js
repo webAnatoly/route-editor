@@ -51,7 +51,7 @@ export default class InputPoint extends React.Component {
   render() {
     return (
       <label>
-        <input type="text" className={s.main} defaultValue={''} onKeyPress={this.handleKeyPress.bind(this)} autoFocus ref={this.myRef} />
+        <input type="text" id="InputPoint" className={s.main} defaultValue={''} onKeyPress={this.handleKeyPress.bind(this)} autoFocus ref={this.myRef} />
         <span className={s.delete} onClick={this.deleteAllPoints.bind(this)}>CLEAR</span>
       </label>
     )

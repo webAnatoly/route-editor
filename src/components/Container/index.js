@@ -27,19 +27,22 @@ Dispatcher.register((action)=>{
       mainStore.setState('Container', mainStore.Container);
       break;
     case actions.MOUSE_UP_DROP:
-      if (action.sameRow) { // если отпустили мышку над тем же элементом
+      if (action.condition === 'sameRow') { // если отпустили мышку над тем же элементом
         mainStore.Container.drag = action.drag;
         mainStore.Container.html = action.html;
         mainStore.setState('Container', mainStore.Container);
         break;
       }
-      const value = action.arrPoints.splice(action.idDelete, 1);
-      action.arrPoints.splice(action.idInsert, 0, value[0]);
-      mainStore.setState('Container', {
-        points: action.arrPoints,
-        drag: { on: false, styles: {}, hoverON: false },
-        html: ''
-      });
+      if (action.condition === 'anotherRow') {
+        const value = action.arrPoints.splice(action.idDelete, 1);
+        action.arrPoints.splice(action.idInsert, 0, value[0]);
+        mainStore.setState('Container', {
+          points: action.arrPoints,
+          drag: { on: false, styles: {} },
+          html: ''
+        });
+        break;
+      }
       break;
     default:
       return null
@@ -78,8 +81,8 @@ export default class Container extends React.Component {
       return cursorPosition - containerPositionY - cursorDifference;
     }
 
-    const inputElementHeight = this.myRef.current.querySelector('input').getBoundingClientRect().height;
-    console.log('inputElementHeiht', inputElementHeight);
+    const inputElementHeight = this.myRef.current.querySelector('#InputPoint').getBoundingClientRect().height;
+    const topBorder = containerPositionY + inputElementHeight;
 
     const topForAbsolutePosition = getPosition(event.pageY);
 
@@ -87,57 +90,73 @@ export default class Container extends React.Component {
       type: 'DRAG_START',
       drag: {
         on: true,
-        styles: { position: 'absolute', top: topForAbsolutePosition, height: heightCurrentOnePointRow },
-        hoverON: false,
+        styles: { position: 'absolute', top: topForAbsolutePosition, height: heightCurrentOnePointRow }
       },
       html: currentOnePointRow.innerHTML
     })
 
     const handleMouseMove = (event) => {
-      const space = getPosition(event.pageY);
+      let space = getPosition(event.pageY);
+      if (event.pageY - cursorDifference < topBorder) {
+        space = inputElementHeight;
+      }
       Dispatcher.dispatch({
         type: 'DRAG_MOUSE_MOVE',
-        drag: { on: true, styles: { position: 'absolute', top: space, height: heightCurrentOnePointRow }, hoverON: true }
+        drag: { on: true, styles: { position: 'absolute', top: space, height: heightCurrentOnePointRow } }
       })
+      // еще надо реализовать обработку быстрого ухода мыши с элемента
+      // и автопрокрутку страницы если колво рядов уходит за пределы экрана
+      // чтобы не выходил за пределы inputa при перетаскивании
     }
-    // еще надо реализовать обработку быстрого ухода мыши с элемента
-    // и автопрокрутку страницы если колво рядов уходит за пределы экрана
-    // чтобы не выходил за пределы inputa при перетаскивании
-    this.myRef.current.addEventListener('mousemove', handleMouseMove);
-    console.log(this.myRef.current);
+    document.documentElement.addEventListener('mousemove', handleMouseMove);
 
     const handleMouseUp = (event) => {
+      // удаляем обработчики
+      document.documentElement.removeEventListener('mousemove', handleMouseMove);
+      document.documentElement.removeEventListener('mouseup', handleMouseUp);
 
       // находим компонент OnePointRow
       let target = event.target;
-      while (target.tagName !== 'DIV') {
+      while (target.tagName !== 'HTML') {
+        if(target.dataset.about === 'OnePointRow') {
+          console.log('dataset', target.dataset.about);
+          break;
+        }
         target = target.parentElement;
       }
       let onePointRow = target;
+      let idInsert;
 
-      // удаляем обработчики
-      this.myRef.current.removeEventListener('mousemove', handleMouseMove);
-      this.myRef.current.parentElement.removeEventListener('mouseup', handleMouseUp);
+      if (onePointRow.dataset.about === 'OnePointRow') { // mouseup над компонентом 'OnePointRow'
+        idInsert = onePointRow.id;
+      } else {
+        const [x, y] = [this.myRef.current.getBoundingClientRect().left + this.myRef.current.getBoundingClientRect().width / 2, event.pageY]
+        const elem = document.elementFromPoint(x, y);// получить элемент над которым был mouseup
+        if (elem.dataset.about === 'OnePointRow') {
+          idInsert = elem.id;
+        } else {
+          idInsert = event.pageY < topBorder ? 0 : this.state.points.length - 1;
+        }
+      } 
 
-      // меняем положение рядов
       if (currentOnePointRow.id !== onePointRow.id) {
         Dispatcher.dispatch({
           type: 'MOUSE_UP_DROP',
-          sameRow: false, 
+          condition: 'anotherRow',
           idDelete: currentOnePointRow.id,
-          idInsert: onePointRow.id,
+          idInsert: idInsert,
           arrPoints: this.state.points
         })
       } else { // если mouseup случилось на том же элементе, что и mousedown
         Dispatcher.dispatch({
           type: 'MOUSE_UP_DROP',
-          sameRow: true, 
-          drag: { on: false, styles: {}, hoverON: false },
+          condition: 'sameRow',
+          drag: { on: false, styles: {} },
           html: ''
         })
       }
     }
-    this.myRef.current.parentElement.addEventListener('mouseup', handleMouseUp);
+    document.documentElement.addEventListener('mouseup', handleMouseUp);
   }
 
   render() {
@@ -146,7 +165,7 @@ export default class Container extends React.Component {
       drag = <Drag styles={this.state.drag.styles} html={this.state.html}/>;
     }
     const points = this.state.points.map((point, index)=>{
-      return <OnePointRow value={point} key={index} id={index} hoverON={this.state.drag.hoverON}/>
+      return <OnePointRow value={point} key={index} id={index} />
     });
     return (
       <div className={`${s.container}`} onDragStart={this.handleDragStart} onMouseDown={this.handleMouseDown} ref={this.myRef}>

@@ -37,7 +37,7 @@ const counterStore = Object.assign({}, Store);
 // инициализация первоначальных состояний для компонентов
 mainStore.Container = {
   points: [],
-  drag: { on: false, styles: {}, hoverON: false },
+  drag: { on: false, styles: {} },
   html: '',
 }
 
