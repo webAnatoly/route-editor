@@ -2,7 +2,7 @@
   position: inherit;
   width: 380px;
   min-height: 700px;
-  border: 1px solid red;
-  /* border: none; */
+  /* border: 1px solid red; */
+  border: none;
   font-size: 1.3rem;
 }

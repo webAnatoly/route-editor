@@ -7,6 +7,7 @@ import keyMirror from 'fbjs/lib/keyMirror';
 const actions = keyMirror({
   ADD_ENTRY_POINT: null,
   DEL_ALL_POINTS: null,
+  YANDEX_MAP_SET_CENTER: null,
 });
 
 Dispatcher.register((action) => {
@@ -36,6 +37,10 @@ export default class InputPoint extends React.Component {
       let value = event.target.value;
       Dispatcher.dispatch({
         type: actions.ADD_ENTRY_POINT,
+        value: value
+      })
+      Dispatcher.dispatch({
+        type: actions.YANDEX_MAP_SET_CENTER,
         value: value
       })
       event.target.value = '';

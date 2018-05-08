@@ -51,4 +51,8 @@ mainStore.OnePointRow = {
 
 mainStore.Button = { count: 0 };
 
+mainStore.YandexMap = {
+  ymaps: window.ymaps
+}
+
 export {counterStore, mainStore};
