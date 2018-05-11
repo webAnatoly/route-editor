@@ -44,39 +44,48 @@ export default class InputPoint extends React.Component {
   handleKeyPress(event) {
     if (event.key === 'Enter') {
       let value = event.target.value;
+      let idPoint = mainStore.Container.points.length;
       Dispatcher.dispatch({
         type: actions.ADD_ENTRY_POINT,
         value: value
       })
-      this.addPointsAndLinesOnYandexMap(value);
+      this.addPointsAndLinesOnYandexMap(value, idPoint);
       event.target.value = '';
     }
   }
 
-  addPointsAndLinesOnYandexMap(value) {
+  addPointsAndLinesOnYandexMap(value, idPoint) {
     // Добавляем точку на карту
     mainStore.YandexMap.ymaps.ready(() => {
       mainStore.YandexMap.ymaps.geocode(value)
       .then(
         function (res) {
-          if (res.geoObjects.get(0) !== null) {
-            let coords = res.geoObjects.get(0).geometry.getCoordinates(); // получить координаты точки
+          let myGeoCodeResult = res.geoObjects.get(0);
+          if (myGeoCodeResult) {
+            let coords = myGeoCodeResult.geometry.getCoordinates(); // получить координаты точки
             return coords;
           } else {
-            console.log('res.geoObjects.get(0) === 0', res.geoObjects.get(0));
+            console.log('ошибка в myGeoCodeResult', myGeoCodeResult);
+            // Если геокодер ничего не нашел, то надо удалить запись о точке из меню и из mainStore 
+            Dispatcher.dispatch({
+              type: 'REMOVE_ENTRY_POINT',
+              id: idPoint
+            })
+            return false;
           }
         },
         function (err) {
-          console.log('ошибка в myGeocoder', err);
-          // обработка ошибки
+          console.log('ошибка в geocode', err);
         }
       ).then(
-        (coords)=>{
-          mainStore.YandexMap.coordsArr.push(coords);
-          mainStore.YandexMap.myMap.setCenter(coords);
-          updatePointsAndLinesOnMap();
+        (coords) => {
+          if (coords) {
+            mainStore.YandexMap.coordsArr.push(coords);
+            mainStore.YandexMap.myMap.setCenter(coords);
+            updatePointsAndLinesOnMap();
+          }
         },
-        (err) => { console.log('ошибка', err); }
+        (err) => { console.log('ошибка2 в geocode', err); }
       )
     })
 

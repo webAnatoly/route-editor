@@ -19,16 +19,15 @@ Dispatcher.register((action) => {
       });
       mainStore.Container.points = arrWithoutElement;
 
-      // Теперь удаляем координату с таким же индексом из массива в котором храним координаты
-      let prevCoordsArr = mainStore.YandexMap.coordsArr;
-      let coordsArrWithoutDeletedCoord = prevCoordsArr.filter((item, index) => {
-        return index != action.id;
-      });
+      // Если передан параметр deleteFromCoords, то удаляем координату с таким же индексом из массива в котором храним координаты
+      if (action.deleteFromCoords) {
+        let prevCoordsArr = mainStore.YandexMap.coordsArr;
+        let coordsArrWithoutDeletedCoord = prevCoordsArr.filter((item, index) => {
+          return index != action.id;
+        });
 
-      mainStore.YandexMap.coordsArr = coordsArrWithoutDeletedCoord; // обновляем массив координат
-
-      // Удаляем точку из коллекции геообъектов
-      // mainStore.YandexMap.myGeoObjectCollectionForPoints.remove(mainStore.YandexMap.myGeoObjectCollectionForPoints.get(action.id));
+        mainStore.YandexMap.coordsArr = coordsArrWithoutDeletedCoord; // обновляем массив координат
+      }
       
       // Обнавляем точки и линии на карте
       updatePointsAndLinesOnMap();
@@ -51,7 +50,8 @@ export default class OnePointRow extends React.Component {
   handleClick(event) {
     Dispatcher.dispatch({
       type: 'REMOVE_ENTRY_POINT',
-      id: this.props.id
+      id: this.props.id,
+      deleteFromCoords: true,
     })
   }
   

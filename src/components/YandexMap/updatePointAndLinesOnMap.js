@@ -5,9 +5,7 @@ function myEventHandler (event){
     const newCoordinates = event.get('target').geometry.getCoordinates();
     const id = event.get('target').properties.get('myId');
     mainStore.YandexMap.coordsArr[id] = newCoordinates;
-    // можно делать обратное геокодирование из координат в адрес
-    // добавлять полученный адрес mainStore.Container.points
-
+    // обратное геокодирование из координат в адрес
     mainStore.YandexMap.ymaps.geocode(newCoordinates)
       .then(
         function (res) {
