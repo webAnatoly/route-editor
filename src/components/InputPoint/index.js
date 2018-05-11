@@ -18,6 +18,9 @@ Dispatcher.register((action) => {
       break;
     case actions.DEL_ALL_POINTS:
       mainStore.Container.points = [];
+      mainStore.YandexMap.coordsArr = [];
+      mainStore.YandexMap.myGeoObjectCollectionForLines.removeAll();
+      mainStore.YandexMap.myGeoObjectCollectionForPoints.removeAll();
       mainStore.setState('Container', mainStore.Container); // и тут я весь объект переписываю. Наверное лучше будет если менять только одно свойство points. Ну пока так пусть побудет.
       break;
     default:
@@ -42,10 +45,6 @@ export default class InputPoint extends React.Component {
       this.addPointsAndLinesOnYandexMap(value);
       event.target.value = '';
     }
-  }
-
-  removePointsAndLinesFromYandexMap() {
-
   }
 
   addPointsAndLinesOnYandexMap(value) {
