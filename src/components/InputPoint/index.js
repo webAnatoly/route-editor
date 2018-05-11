@@ -7,6 +7,7 @@ import updatePointsAndLinesOnMap from '../YandexMap/updatePointAndLinesOnMap'
 
 const actions = keyMirror({
   ADD_ENTRY_POINT: null,
+  CHANGE_ENTRY_POINT: null,
   DEL_ALL_POINTS: null,
   YANDEX_MAP_SET_CENTER: null,
 });
@@ -16,6 +17,10 @@ Dispatcher.register((action) => {
     case actions.ADD_ENTRY_POINT:
       mainStore.Container.points.push(action.value);
       mainStore.setState('Container', mainStore.Container); // тут я весь объект переписываю. Наверное лучше будет если менять только одно свойство points. Ну пока так пусть побудет.
+      break;
+    case actions.CHANGE_ENTRY_POINT:
+      mainStore.Container.points[action.id] = action.value;
+      mainStore.emitChange();
       break;
     case actions.DEL_ALL_POINTS:
       mainStore.Container.points = [];

@@ -9,6 +9,9 @@ const Store = Object.assign({}, EventEmitter.prototype, {
     this[key] = value;
     this.emit('change');
   },
+  emitChange() {
+    this.emit('change')
+  },
   addChangeListener(callback) {
     this.on('change', callback);
   },

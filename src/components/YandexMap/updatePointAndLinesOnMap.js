@@ -1,9 +1,48 @@
 import {mainStore} from '../../data/Stores';
+import Dispatcher from '../../data/appDispatcher'; 
 
 function myEventHandler (event){
     const newCoordinates = event.get('target').geometry.getCoordinates();
     const id = event.get('target').properties.get('myId');
     mainStore.YandexMap.coordsArr[id] = newCoordinates;
+    // можно делать обратное геокодирование из координат в адрес
+    // добавлять полученный адрес mainStore.Container.points
+
+    mainStore.YandexMap.ymaps.geocode(newCoordinates)
+      .then(
+        function (res) {
+          if (res.geoObjects.get(0) !== null) {
+            // пытаюсь получить адрес точки по координатам
+            const firstGeoObject = res.geoObjects.get(0);
+            
+            const adressFromCoords = [
+              // Название населенного пункта или вышестоящее административно-территориальное образование.
+              firstGeoObject.getLocalities().length ? firstGeoObject.getLocalities() : firstGeoObject.getAdministrativeAreas(),
+              // Получаем путь до топонима, если метод вернул null, запрашиваем наименование здания.
+              firstGeoObject.getThoroughfare() || firstGeoObject.getPremise()
+            ].filter(Boolean).join(', ');
+            return(adressFromCoords);
+          } else {
+            console.log('res.geoObjects.get(0) === 0', res.geoObjects.get(0));
+          }
+        },
+        function (err) {
+          console.log('ошибка в myGeocoder', err);
+          // обработка ошибки
+      })
+      .then(
+        (adress) => {
+          // Через Dispatcher обновляю массив mainStore.Container.points, чтобы добится обновления записей о точках в списке точек
+          Dispatcher.dispatch({
+            type: 'CHANGE_ENTRY_POINT',
+            value: adress,
+            id: id
+          })
+        },
+        (err) => {
+          console.log('ошибка в процессе получения адреса', err)
+      });
+
     updatePointsAndLinesOnMap();
   }
   
@@ -26,7 +65,11 @@ function updatePointsAndLinesOnMap(){
           // Контент метки.
           iconContent: index + 1,
           hintContent: 'hintContent',
-          myId: index
+          myId: index,
+          // Чтобы балун и хинт открывались на метке, необходимо задать ей определенные свойства.
+          // balloonContentHeader: "Инфо:",
+          balloonContentBody: `${mainStore.Container.points[index]}`,
+          balloonContentFooter: `${coords} `,
         }
       }, {
           // Опции.

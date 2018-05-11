@@ -38,6 +38,11 @@ export default class YandexMap extends React.Component {
       // Добавляем геоколлекции на карту
       mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionLines);
       mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionPoints);
+
+      // Добавляем балун
+      const balloon = new ymaps.Balloon(mainStore.YandexMap.myMap);
+      // balloon.options.setParent(mainStore.YandexMap.myMap);
+      balloon.open(mainStore.YandexMap.myMap.getCenter());
     });
   }
   componentWillUpdate(){
