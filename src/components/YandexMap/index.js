@@ -20,9 +20,26 @@ export default class YandexMap extends React.Component {
         center: [55.93, 47.79],
         zoom: 10
       });
+
+      // Создаем коллекцию геообъектов для точек
+      mainStore.YandexMap.myGeoObjectCollectionPoints = new mainStore.YandexMap.ymaps.GeoObjectCollection({}, {
+        preset: "islands#redCircleIcon",
+        geodesic: true
+      })
+
+      // Создаем коллекцию геообъектов для линий.
+      mainStore.YandexMap.myGeoObjectCollectionLines = new mainStore.YandexMap.ymaps.GeoObjectCollection({}, {
+        preset: "",
+        strokeWidth: 4,
+        geodesic: true
+      });
+
+      // Добавляем геоколлекции на карту
+      mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionLines);
+      mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionPoints);
     });
   }
   componentWillUpdate(){
-    console.log('update');
+    // console.log('update');
   }
 }

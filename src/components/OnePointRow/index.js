@@ -4,51 +4,11 @@ import s from './style.css';
 import { mainStore } from '../../data/Stores';
 import Dispatcher from '../../data/appDispatcher';
 import keyMirror from 'fbjs/lib/keyMirror';
+import updatePointsAndLinesOnMap from '../YandexMap/updatePointAndLinesOnMap'
 
 const actions = keyMirror({
   REMOVE_ENTRY_POINT: null
 });
-
-const updatePointAndLinesOnMap = () => {
-  // Очистить геоколлекции точек и линий перед добавлением новых
-  if (mainStore.YandexMap.myGeoObjectCollectionForLines.getLength()) {
-    mainStore.YandexMap.myGeoObjectCollectionForLines.removeAll()
-  }
-
-  if (mainStore.YandexMap.myGeoObjectCollectionForPoints.getLength()) {
-    mainStore.YandexMap.myGeoObjectCollectionForPoints.removeAll()
-  }
-
-  // Добавить точки и линии в геоколекцию
-  mainStore.YandexMap.myGeoObjectCollectionForLines.add(new ymaps.Polyline(mainStore.YandexMap.coordsArr, {}, { draggable: true }));
-  mainStore.YandexMap.coordsArr.forEach((coords, index)=>{
-    mainStore.YandexMap.myGeoObjectCollectionForPoints.add(
-      new ymaps.GeoObject({
-        // Описание геометрии.
-        geometry: {
-          type: "Point",
-          coordinates: coords
-        },
-        // Свойства.
-        properties: {
-          // Контент метки.
-          iconContent: index + 1,
-          hintContent: 'hintContent'
-        }
-      }, {
-          // Опции.
-          // Иконка метки будет растягиваться под размер ее содержимого.
-          preset: 'islands#blackStretchyIcon',
-          // Метку можно перемещать.
-          draggable: true
-        })
-    )
-  })
-
-  // Добавить точки и линии на карту
-  mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionForLines);
-  mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionForPoints);
-}
 
 Dispatcher.register((action) => {
   switch (action.type) {
@@ -68,10 +28,10 @@ Dispatcher.register((action) => {
       mainStore.YandexMap.coordsArr = coordsArrWithoutDeletedCoord; // обновляем массив координат
 
       // Удаляем точку из коллекции геообъектов
-      mainStore.YandexMap.myGeoObjectCollectionForPoints.remove(mainStore.YandexMap.myGeoObjectCollectionForPoints.get(action.id));
+      // mainStore.YandexMap.myGeoObjectCollectionForPoints.remove(mainStore.YandexMap.myGeoObjectCollectionForPoints.get(action.id));
       
       // Обнавляем точки и линии на карте
-      updatePointAndLinesOnMap();
+      updatePointsAndLinesOnMap();
 
       mainStore.setState('Container', mainStore.Container); // тут я весь объект переписываю. Наверное лучше будет если менять только одно свойство points. Ну пока так пусть побудет.
       break;

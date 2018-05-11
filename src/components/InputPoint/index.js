@@ -3,6 +3,7 @@ import s from './style.css';
 import {mainStore} from '../../data/Stores';
 import Dispatcher from '../../data/appDispatcher';
 import keyMirror from 'fbjs/lib/keyMirror';
+import updatePointsAndLinesOnMap from '../YandexMap/updatePointAndLinesOnMap'
 
 const actions = keyMirror({
   ADD_ENTRY_POINT: null,
@@ -19,8 +20,8 @@ Dispatcher.register((action) => {
     case actions.DEL_ALL_POINTS:
       mainStore.Container.points = [];
       mainStore.YandexMap.coordsArr = [];
-      mainStore.YandexMap.myGeoObjectCollectionForLines.removeAll();
-      mainStore.YandexMap.myGeoObjectCollectionForPoints.removeAll();
+      mainStore.YandexMap.myGeoObjectCollectionLines.removeAll();
+      mainStore.YandexMap.myGeoObjectCollectionPoints.removeAll();
       mainStore.setState('Container', mainStore.Container); // и тут я весь объект переписываю. Наверное лучше будет если менять только одно свойство points. Ну пока так пусть побудет.
       break;
     default:
@@ -54,7 +55,7 @@ export default class InputPoint extends React.Component {
       .then(
         function (res) {
           if (res.geoObjects.get(0) !== null) {
-            let coords = res.geoObjects.get(0).geometry.getCoordinates();
+            let coords = res.geoObjects.get(0).geometry.getCoordinates(); // получить координаты точки
             return coords;
           } else {
             console.log('res.geoObjects.get(0) === 0', res.geoObjects.get(0));
@@ -67,42 +68,8 @@ export default class InputPoint extends React.Component {
       ).then(
         (coords)=>{
           mainStore.YandexMap.coordsArr.push(coords);
-          // Создаем геообъект с типом геометрии "Точка".
-          let myGeoObjectPoint = new ymaps.GeoObject({
-            // Описание геометрии.
-            geometry: {
-              type: "Point",
-              coordinates: coords
-            },
-            // Свойства.
-            properties: {
-              // Контент метки.
-              iconContent: mainStore.Container.points.length,
-              hintContent: 'hintContent'
-            }
-          }, {
-              // Опции.
-              // Иконка метки будет растягиваться под размер ее содержимого.
-              preset: 'islands#blackStretchyIcon',
-              // Метку можно перемещать.
-              draggable: true
-            })
-
           mainStore.YandexMap.myMap.setCenter(coords);
-
-          // Очистить геоколлекцию линий перед добавлением новых линий
-          if (mainStore.YandexMap.myGeoObjectCollectionForLines.getLength()) {
-            mainStore.YandexMap.myGeoObjectCollectionForLines.removeAll()
-          }
-
-          // Добавить точки и линии в геоколекцию
-          mainStore.YandexMap.myGeoObjectCollectionForLines.add(new ymaps.Polyline(mainStore.YandexMap.coordsArr, {}, { draggable: true }));
-          mainStore.YandexMap.myGeoObjectCollectionForPoints.add(myGeoObjectPoint);
-
-          // Добавить точки и линии на карту
-          mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionForLines);
-          mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionForPoints);
-
+          updatePointsAndLinesOnMap();
         },
         (err) => { console.log('ошибка', err); }
       )

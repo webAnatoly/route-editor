@@ -56,19 +56,4 @@ mainStore.YandexMap = {
   coordsArr: [], // тут буду хранить координаты полученные в результате геокодирования [[55.755814, 37.617635]]
 }
 
-ymaps.ready(()=>{
-  // Создаем коллекцию геообъектов для линий.
-  mainStore.YandexMap.myGeoObjectCollectionForLines = new ymaps.GeoObjectCollection({}, {
-    preset: "",
-    strokeWidth: 4,
-    geodesic: true
-  });
-  // Создаем коллекцию геообъектов для точек
-  mainStore.YandexMap.myGeoObjectCollectionForPoints = new ymaps.GeoObjectCollection({}, {
-      preset: "islands#redCircleIcon",
-      geodesic: true
-    })
-})
-
-
 export {counterStore, mainStore};

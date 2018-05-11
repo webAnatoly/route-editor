@@ -8,6 +8,7 @@ import checkClass from '../OnePointRow/style.css';
 import {mainStore} from '../../data/Stores';
 import Dispatcher from '../../data/appDispatcher';
 import keyMirror from 'fbjs/lib/keyMirror';
+import updatePointsAndLinesOnMap from '../YandexMap/updatePointAndLinesOnMap';
 
 const actions = keyMirror({
   DRAG_START: null,
@@ -42,39 +43,8 @@ Dispatcher.register((action)=>{
         const coordsForMoving = mainStore.YandexMap.coordsArr.splice(action.idDelete, 1);
         mainStore.YandexMap.coordsArr.splice(action.idInsert, 0, coordsForMoving[0])
 
-        // Очищаем геоколекцию
-        mainStore.YandexMap.myGeoObjectCollectionForPoints.removeAll();
-        mainStore.YandexMap.myGeoObjectCollectionForLines.removeAll();
-
-        // Добавить точки и линии в геоколекцию
-        mainStore.YandexMap.myGeoObjectCollectionForLines.add(new ymaps.Polyline(mainStore.YandexMap.coordsArr, {}, { draggable: true }));
-        mainStore.YandexMap.coordsArr.forEach((coords, index) => {
-          mainStore.YandexMap.myGeoObjectCollectionForPoints.add(
-            new ymaps.GeoObject({
-              // Описание геометрии.
-              geometry: {
-                type: "Point",
-                coordinates: coords
-              },
-              // Свойства.
-              properties: {
-                // Контент метки.
-                iconContent: index + 1,
-                hintContent: 'hintContent'
-              }
-            }, {
-                // Опции.
-                // Иконка метки будет растягиваться под размер ее содержимого.
-                preset: 'islands#blackStretchyIcon',
-                // Метку можно перемещать.
-                draggable: true
-              })
-          )
-        })
-
-        // Добавить точки и линии на карту
-        mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionForLines);
-        mainStore.YandexMap.myMap.geoObjects.add(mainStore.YandexMap.myGeoObjectCollectionForPoints);
+        // Обновляем точки, линии
+        updatePointsAndLinesOnMap();
       
         mainStore.setState('Container', {
           points: action.arrPoints,
