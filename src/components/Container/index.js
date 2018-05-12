@@ -135,22 +135,47 @@ export default class Container extends React.Component {
       }
       let onePointRow = target;
 
-      if (currentOnePointRow.id === onePointRow.id) { // если mouseup случилось на том же элементе, что и mousedown
-        Dispatcher.dispatch({
-          type: 'MOUSE_UP_DROP',
-          condition: 'sameRow',
-          drag: { on: false, styles: {} },
-          html: ''
-        })
-      } else {
+      // mouseup случился над любым из элементов OnePointRow
+      if (onePointRow.dataset.about === 'OnePointRow') { 
+        // mouseup на том же элементе, что и mousedown
+        if (currentOnePointRow.id === onePointRow.id) { 
+          Dispatcher.dispatch({
+            type: 'MOUSE_UP_DROP',
+            condition: 'sameRow',
+            drag: { on: false, styles: {} },
+            html: ''
+          })
+        } else { // mouseup над любым другим элементом OnePointRow
+          // your code here
+          Dispatcher.dispatch({
+            type: 'MOUSE_UP_DROP',
+            condition: 'anotherRow',
+            idDelete: currentOnePointRow.id,
+            idInsert: onePointRow.id,
+            arrPoints: this.state.points
+          })
+        }
+      } else { // mouseup случился где угодно, но НЕ над элементом OnePointRow
         let idInsert;
-        const [x, y] = [this.myRef.current.getBoundingClientRect().left + this.myRef.current.getBoundingClientRect().width / 2, event.pageY]
-        const elem = document.elementFromPoint(x, y);
-        if (elem && elem.dataset.about === 'OnePointRow') {
-          idInsert = elem.id;
+        // понять находился ли курсор напротив одного из элемента OnePointRow по горизонатльной линии X
+        const [x, y] = [this.myRef.current.getBoundingClientRect().left + (this.myRef.current.getBoundingClientRect().width / 2), event.pageY]
+        let elem = document.elementFromPoint(x, y);
+
+        if (elem) {
+          while (elem.tagName !== 'HTML') {
+            if (elem.dataset.about === 'OnePointRow') {
+              break;
+            }
+            elem = elem.parentElement;
+            if (elem && elem.dataset.about === 'OnePointRow') {
+              idInsert = elem.id
+            } else {
+              idInsert = event.pageY < topBorder ? 0 : this.state.points.length - 1;
+            }
+          }
         } else {
           idInsert = event.pageY < topBorder ? 0 : this.state.points.length - 1;
-        } 
+        }
         Dispatcher.dispatch({
           type: 'MOUSE_UP_DROP',
           condition: 'anotherRow',

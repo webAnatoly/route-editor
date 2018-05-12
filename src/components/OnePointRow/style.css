@@ -2,7 +2,8 @@
   position: inherit;
   padding: 5px;
   padding-right: 55px;
-  padding-bottom: 2px;
+  padding-bottom: 10px;
+  padding-top: 10px;
   border: 4px transparent;
   width: 380px;
   min-height: 35px;
@@ -11,7 +12,7 @@
 }
 .button {
   position: absolute;
-  top: 6px;
+  top: 16px;
   right: 10px;
   background-color:rgba(128, 128, 128, 0.308);
   border: 2px solid black;

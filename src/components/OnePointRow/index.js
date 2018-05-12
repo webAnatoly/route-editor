@@ -59,27 +59,9 @@ export default class OnePointRow extends React.Component {
     const id = this.props.id;
     return (
       <div ref={this.myRef} className={`${s.rowContainer}`} id={id} data-about={'OnePointRow'}>
-        <span className={`${s.noSelect}`}>{this.props.value} {this.props.id + 1}</span>
+        <span className={`${s.noSelect}`}>{this.props.value}</span>
         <button className={s.button} onClick={this.handleClick}><span className={s.noSelect}>&#10005;</span></button>
       </div>
     )
-  }
-
-  componentDidMount() {
-    console.log('component OnePointRow Did Mount');
-    /* Наверное тут будет запуск функции добавления точек. Будем проходить по массиву mainStore.Component.points и каждую точку добавлять на Yandex Карту. 
-    Наверное это будет реализовано через асинхронный map или что-то в этом духе. 
-
-    А если много точек добавлено, например сто и две из них поменяли местами? Удалять все точки и заново их добавлять?
-    Или может быть точки добавленные на карту хранить в отдельном массиве placedOnMapPoints и при каждом 
-    обновлении массива mainStore.Component.points сравнивать эти два массива и удалять/добавлять только отличающиеся точки. 
-
-    Пока сделаю простой вариант, потом подумаю как улучшить. 
-
-    Через геоколлекции наверное лучше это делать. 
-    */
-  }
-  componentWillUnmount() {
-    // console.log('component OnePointRow Will Unmount');
   }
 }
