@@ -10,6 +10,7 @@ const actions = keyMirror({
   CHANGE_ENTRY_POINT: null,
   DEL_ALL_POINTS: null,
   YANDEX_MAP_SET_CENTER: null,
+  SHOW_ALERT: null,
 });
 
 Dispatcher.register((action) => {
@@ -28,6 +29,14 @@ Dispatcher.register((action) => {
       mainStore.YandexMap.myGeoObjectCollectionLines.removeAll();
       mainStore.YandexMap.myGeoObjectCollectionPoints.removeAll();
       mainStore.setState('Container', mainStore.Container); // и тут я весь объект переписываю. Наверное лучше будет если менять только одно свойство points. Ну пока так пусть побудет.
+      break;
+    case actions.SHOW_ALERT:
+        mainStore.showAlert = true;
+        mainStore.emitChange();
+        setTimeout(()=>{
+          mainStore.showAlert = false;
+          mainStore.emitChange();
+        },2000)
       break;
     default:
       return null;
@@ -66,10 +75,14 @@ export default class InputPoint extends React.Component {
             return coords;
           } else {
             console.log('ошибка в myGeoCodeResult', myGeoCodeResult);
-            // Если геокодер ничего не нашел, то надо удалить запись о точке из меню и из mainStore 
+            // Если геокодер ничего не нашел, то надо удалить запись о точке из меню и из mainStore. Показать пользователю сообщение, что ничего не найдено.
             Dispatcher.dispatch({
               type: 'REMOVE_ENTRY_POINT',
               id: idPoint
+            })
+            Dispatcher.dispatch({
+              type: actions.SHOW_ALERT,
+              showAlert: true,
             })
             return false;
           }

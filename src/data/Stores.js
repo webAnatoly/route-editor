@@ -37,7 +37,9 @@ export {counterStore, toDoStore, loginToDoStore};
 const mainStore = Object.assign({}, Store);
 const counterStore = Object.assign({}, Store);
 
-// инициализация первоначальных состояний для компонентов
+// инициализация первоначальных состояний
+mainStore.showAlert = false;
+
 mainStore.Container = {
   points: [],
   drag: { on: false, styles: {} },
