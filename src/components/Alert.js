@@ -1,9 +1,5 @@
 import React from 'react';
 
-// import Dispatcher from '../../data/appDispatcher';
-// import { mainStore } from '../../data/Stores';
-// import keyMirror from 'fbjs/lib/keyMirror';
-
 const styles = {
   width: '500px',
   height: '40px',
@@ -25,8 +21,5 @@ export default class Alert extends React.Component {
         <div>{message}</div>
       </div>
     )
-  }
-  componentWillUnmount(){
-    console.log('component Alert WillUnmount');
   }
 }

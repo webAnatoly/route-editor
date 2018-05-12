@@ -2,6 +2,7 @@ import React from 'react';
 import YandexMap from '../YandexMap';
 import Container from '../Container';
 import Alert from '../Alert';
+import Block from '../Block';
 
 import Dispatcher from '../../data/appDispatcher';
 import { mainStore } from '../../data/Stores';
@@ -20,6 +21,7 @@ export default class App extends React.Component {
     return(
       <div className={s.app}>
         {alertComponent}
+        <Block/>
         <Container/>
         <YandexMap/>
       </div>
