@@ -46,12 +46,13 @@ Dispatcher.register((action) => {
 export default class InputPoint extends React.Component {
   constructor(props) {
     super(props);
-    this.myRef = React.createRef();
+    this.myRef = React.createRef(); // TODO: [🐱👀] Не ясно, зачем здесь ref
     this.state = mainStore.InputPoint;
   }
 
   handleKeyPress(event) {
     if (event.key === 'Enter') {
+      // TODO: [🐱👀] Здесь и в других местах let вместо const
       let value = event.target.value;
       let idPoint = mainStore.Container.points.length;
       Dispatcher.dispatch({

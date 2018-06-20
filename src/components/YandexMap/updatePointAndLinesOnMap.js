@@ -1,3 +1,5 @@
+// TODO: [🐱👀] Видимо, этот файл нужно перенести в src/components/InputPoint/index.js
+
 import {mainStore} from '../../data/Stores';
 import Dispatcher from '../../data/appDispatcher'; 
 

@@ -10,6 +10,7 @@ import Dispatcher from '../../data/appDispatcher';
 import keyMirror from 'fbjs/lib/keyMirror';
 import updatePointsAndLinesOnMap from '../YandexMap/updatePointAndLinesOnMap';
 
+// TODO: [🐱👀] Здесь и в других местах было бы лучше держать actions в отдельном файле
 const actions = keyMirror({
   DRAG_START: null,
   DRAG_MOUSE_MOVE: null,
@@ -73,6 +74,8 @@ export default class Container extends React.Component {
     e.preventDefault();
   }
 
+  // TODO: [🐱👀] Реализация драг-дропа. Можно заменить на готовую библиотеку
+  // https://github.com/react-dnd/react-dnd
   handleMouseDown(event) {
     // Определяем где было нажатие и если оно было там где не надо, то выходим из обработчика.
     let target = event.target;
@@ -194,6 +197,8 @@ export default class Container extends React.Component {
       drag = <Drag styles={this.state.drag.styles} html={this.state.html}/>;
     }
     const points = this.state.points.map((point, index)=>{
+      // TODO: [🐱👀] key={index} приведет к побочным эффектам
+      // https://medium.com/@robinpokorny/index-as-a-key-is-an-anti-pattern-e0349aece318
       return <OnePointRow value={point} key={index} id={index} />
     });
     return (
@@ -218,6 +223,7 @@ export default class Container extends React.Component {
   }
 
   componentDidUpdate(){
+    // TODO: [🐱👀] Ненужный комментарий
     // console.log('mouse click', this.state.drag);
   }
 

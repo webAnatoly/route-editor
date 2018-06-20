@@ -42,14 +42,14 @@ Dispatcher.register((action) => {
 export default class OnePointRow extends React.Component {
   constructor(props) {
     super(props);
-    this.myRef = React.createRef();
+    this.myRef = React.createRef(); // TODO: [🐱👀] Не ясно, зачем здесь ref
     this.state = mainStore.OnePointRow;
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick(event) {
     Dispatcher.dispatch({
-      type: 'REMOVE_ENTRY_POINT',
+      type: 'REMOVE_ENTRY_POINT', // TODO: [🐱👀] Задано строкой, а не константой как в других местах
       id: this.props.id,
       deleteFromCoords: true,
     })
