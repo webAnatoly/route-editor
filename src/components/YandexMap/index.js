@@ -4,6 +4,7 @@ import Dispatcher from '../../data/appDispatcher';
 import {mainStore} from '../../data/Stores';
 
 export default class YandexMap extends React.Component {
+  // TODO: [🐱👀] Ненужный constructor
   constructor(props){
     super(props)
   }
